@@ -1,0 +1,90 @@
+.dashboard {
+  .titulo {
+    font-size: 1.5rem;
+    font-weight: bold;
+    margin-bottom: 1.5rem;
+    color: #1e293b;
+
+    @media (max-width: 768px) {
+      font-size: 1.2rem;
+    }
+  }
+
+  .tarjetas {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 1rem;
+    margin-bottom: 2rem;
+
+    @media (max-width: 768px) {
+      grid-template-columns: 1fr;
+    }
+
+    .tarjeta-contenido {
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+
+      .icono { font-size: 2rem; }
+
+      .label {
+        font-size: 0.85rem;
+        color: #64748b;
+        margin: 0;
+      }
+
+      .valor {
+        font-size: 1.4rem;
+        font-weight: bold;
+        margin: 0;
+        color: #1e293b;
+
+        &.negativo { color: #ef4444; }
+      }
+    }
+  }
+
+  .subtitulo {
+    font-size: 1.2rem;
+    font-weight: bold;
+    margin-bottom: 1rem;
+    color: #1e293b;
+  }
+
+  .vacio {
+    text-align: center;
+    color: #94a3b8;
+    padding: 2rem;
+  }
+
+  .transaccion-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0.75rem 1rem;
+    border-radius: 8px;
+    margin-bottom: 0.5rem;
+    background: white;
+    border-left: 4px solid transparent;
+
+    &.ingreso { border-left-color: #22c55e; }
+    &.gasto { border-left-color: #ef4444; }
+
+    .transaccion-info {
+      display: flex;
+      flex-direction: column;
+
+      .concepto { font-weight: 600; color: #1e293b; }
+      .categoria { font-size: 0.8rem; color: #94a3b8; }
+    }
+
+    .transaccion-derecha {
+      display: flex;
+      flex-direction: column;
+      align-items: flex-end;
+
+      .importe { font-weight: bold; color: #1e293b; }
+      .fecha { font-size: 0.8rem; color: #94a3b8; }
+    }
+  }
+}

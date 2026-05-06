@@ -1,0 +1,58 @@
+<div class="dashboard">
+  <h2 class="titulo">📊 Resumen General</h2>
+
+  <div class="tarjetas">
+    <p-card styleClass="tarjeta ingreso">
+      <div class="tarjeta-contenido">
+        <span class="icono">💚</span>
+        <div>
+          <p class="label">Ingresos</p>
+          <p class="valor">{{ totalIngresos | currency:'EUR':'symbol':'1.2-2' }}</p>
+        </div>
+      </div>
+    </p-card>
+
+    <p-card styleClass="tarjeta gasto">
+      <div class="tarjeta-contenido">
+        <span class="icono">❤️</span>
+        <div>
+          <p class="label">Gastos</p>
+          <p class="valor">{{ totalGastos | currency:'EUR':'symbol':'1.2-2' }}</p>
+        </div>
+      </div>
+    </p-card>
+
+    <p-card styleClass="tarjeta saldo">
+      <div class="tarjeta-contenido">
+        <span class="icono">💰</span>
+        <div>
+          <p class="label">Saldo</p>
+          <p class="valor" [class.negativo]="saldo < 0">
+            {{ saldo | currency:'EUR':'symbol':'1.2-2' }}
+          </p>
+        </div>
+      </div>
+    </p-card>
+  </div>
+
+  <h3 class="subtitulo">🕒 Últimas transacciones</h3>
+
+  @if (ultimasTransacciones.length === 0) {
+    <p class="vacio">No hay transacciones aún. ¡Añade una desde el menú!</p>
+  }
+
+  @for (t of ultimasTransacciones; track t.id) {
+    <div class="transaccion-item" [class.ingreso]="t.tipo === 'ingreso'" [class.gasto]="t.tipo === 'gasto'">
+      <div class="transaccion-info">
+        <span class="concepto">{{ t.concepto }}</span>
+        <span class="categoria">{{ t.categoria }}</span>
+      </div>
+      <div class="transaccion-derecha">
+        <span class="importe">
+          {{ t.tipo === 'ingreso' ? '+' : '-' }}{{ t.importe | currency:'EUR':'symbol':'1.2-2' }}
+        </span>
+        <span class="fecha">{{ t.fecha }}</span>
+      </div>
+    </div>
+  }
+</div>

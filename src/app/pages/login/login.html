@@ -1,0 +1,32 @@
+<p-toast position="top-right" />
+
+<div class="login-container">
+  <p-card>
+    <div class="login-header">
+      <span class="logo">💰 FinanzApp</span>
+      <h2>{{ modoRegistro ? 'Crear cuenta' : 'Iniciar sesión' }}</h2>
+      <p>{{ modoRegistro ? 'Regístrate para empezar' : 'Bienvenido de nuevo' }}</p>
+    </div>
+
+    <div class="form">
+      <label>Email</label>
+      <input pInputText type="email" [(ngModel)]="email" placeholder="tu@email.com" />
+
+      <label>Contraseña</label>
+      <p-password [(ngModel)]="password" [feedback]="false" [toggleMask]="true" placeholder="••••••••" />
+
+      <p-button
+        [label]="modoRegistro ? 'Crear cuenta' : 'Iniciar sesión'"
+        [loading]="cargando"
+        (onClick)="submit()"
+        styleClass="btn-submit" />
+
+      <p class="cambiar-modo">
+        {{ modoRegistro ? '¿Ya tienes cuenta?' : '¿No tienes cuenta?' }}
+        <span (click)="modoRegistro = !modoRegistro">
+          {{ modoRegistro ? 'Inicia sesión' : 'Regístrate' }}
+        </span>
+      </p>
+    </div>
+  </p-card>
+</div>

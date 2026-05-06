@@ -1,0 +1,75 @@
+<div class="divisas">
+  <h2 class="titulo">🌍 Conversor de Divisas</h2>
+  <p class="subtitulo">Tipos de cambio en tiempo real</p>
+
+  @if (cargando) {
+    <div class="cargando">
+      <i class="pi pi-spin pi-spinner" style="font-size: 2rem"></i>
+      <p>Cargando tipos de cambio...</p>
+    </div>
+  } @else {
+    <div class="conversor">
+
+      <p-card>
+        <div class="form-conversor">
+          <div class="campo">
+            <label>Cantidad</label>
+            <input pInputText type="number" [(ngModel)]="cantidad" (ngModelChange)="convertir()" min="0" />
+          </div>
+
+          <div class="fila">
+            <div class="campo">
+              <label>De</label>
+              <p-select
+                [options]="opcionesDivisas"
+                [(ngModel)]="divisaOrigen"
+                optionLabel="label"
+                optionValue="value"
+                (onChange)="cambiarDivisa()" />
+            </div>
+
+            <div class="flecha">→</div>
+
+            <div class="campo">
+              <label>A</label>
+              <p-select
+                [options]="opcionesDivisas"
+                [(ngModel)]="divisaDestino"
+                optionLabel="label"
+                optionValue="value"
+                (onChange)="cambiarDivisa()" />
+            </div>
+          </div>
+        </div>
+
+        <div class="resultado">
+          <span class="cantidad-original">{{ cantidad }} {{ divisaOrigen }}</span>
+          <span class="igual">=</span>
+          <span class="cantidad-convertida">{{ resultado | number:'1.2-2' }} {{ divisaDestino }}</span>
+        </div>
+
+        <div class="tasa-info">
+          <p>Tasa: 1 {{ divisaOrigen }} = {{ tasaActual | number:'1.4-4' }} {{ divisaDestino }}</p>
+          <p class="actualizacion">Última actualización: {{ ultimaActualizacion }}</p>
+        </div>
+      </p-card>
+
+      <p-card styleClass="grafica-card">
+        <h3 class="grafica-titulo">📈 Evolución últimos 7 días</h3>
+        <h4 class="grafica-subtitulo">1 {{ divisaOrigen }} → {{ divisaDestino }}</h4>
+
+        @if (cargandoGrafica) {
+          <div class="cargando">
+            <i class="pi pi-spin pi-spinner" style="font-size: 1.5rem"></i>
+            <p>Cargando histórico...</p>
+          </div>
+        } @else if (errorGrafica) {
+          <p class="error-grafica">⚠️ Histórico no disponible para esta combinación de divisas</p>
+        } @else if (chartData) {
+          <p-chart type="line" [data]="chartData" [options]="chartOptions" />
+        }
+      </p-card>
+
+    </div>
+  }
+</div>

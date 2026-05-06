@@ -1,0 +1,11 @@
+@if (mostrarNavbar) {
+  <app-navbar />
+}
+
+@if (mostrarNavbar) {
+  <main class="contenido">
+    <router-outlet></router-outlet>
+  </main>
+} @else {
+  <router-outlet></router-outlet>
+}

@@ -1,0 +1,69 @@
+<p-toast position="top-right" />
+
+<div class="transacciones">
+  <div class="cabecera">
+    <h2>💸 Transacciones</h2>
+    <p-button label="Nueva transacción" icon="pi pi-plus" (onClick)="abrirDialog()" />
+  </div>
+
+  <p-table [value]="transacciones" stripedRows>
+    <ng-template #header>
+      <tr>
+        <th>Concepto</th>
+        <th>Categoría</th>
+        <th>Tipo</th>
+        <th>Fecha</th>
+        <th>Importe</th>
+        <th style="width: 100px">Acción</th>
+      </tr>
+    </ng-template>
+    <ng-template #body let-t>
+      <tr>
+        <td>{{ t.concepto }}</td>
+        <td>{{ t.categoria }}</td>
+        <td>
+          <span [class]="t.tipo === 'ingreso' ? 'badge ingreso' : 'badge gasto'">
+            {{ t.tipo }}
+          </span>
+        </td>
+        <td>{{ t.fecha }}</td>
+        <td>{{ t.importe | currency:'EUR':'symbol':'1.2-2' }}</td>
+        <td>
+          <button class="btn-borrar" (click)="eliminar(t.id)">🗑️ Borrar</button>
+        </td>
+      </tr>
+    </ng-template>
+    <ng-template #emptymessage>
+      <tr>
+        <td colspan="6" style="text-align:center; color:#94a3b8; padding:2rem">
+          No hay transacciones aún
+        </td>
+      </tr>
+    </ng-template>
+  </p-table>
+
+  <p-dialog header="Nueva Transacción" [(visible)]="mostrarDialog" [modal]="true" [style]="{width: '400px'}">
+    <div class="form">
+      <label>Concepto</label>
+      <input pInputText [(ngModel)]="nueva.concepto" placeholder="Ej: Supermercado" />
+
+      <label>Importe (€)</label>
+      <input pInputText type="number" [(ngModel)]="nueva.importe" placeholder="0.00" />
+
+      <label>Tipo</label>
+      <p-select [options]="tipos" [(ngModel)]="nueva.tipo" optionLabel="label" optionValue="value" />
+
+      <label>Categoría</label>
+      <p-select [options]="categorias" [(ngModel)]="nueva.categoria" optionLabel="nombre" optionValue="nombre"
+        placeholder="Selecciona categoría" />
+
+      <label>Fecha</label>
+      <input pInputText type="date" [(ngModel)]="nueva.fecha" />
+    </div>
+
+    <ng-template #footer>
+      <p-button label="Cancelar" severity="secondary" (onClick)="mostrarDialog = false" />
+      <p-button label="Guardar" (onClick)="guardar()" />
+    </ng-template>
+  </p-dialog>
+</div>

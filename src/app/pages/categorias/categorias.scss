@@ -1,0 +1,45 @@
+.categorias {
+  .cabecera {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1.5rem;
+
+    h2 {
+      font-size: 1.5rem;
+      font-weight: bold;
+      color: #1e293b;
+    }
+  }
+
+  .btn-borrar {
+    background: #fee2e2;
+    color: #dc2626;
+    border: none;
+    padding: 6px 12px;
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 0.85rem;
+
+    &:hover {
+      background: #fecaca;
+    }
+  }
+
+  .form {
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+    padding: 0.5rem 0;
+
+    label {
+      font-weight: 600;
+      color: #475569;
+      font-size: 0.9rem;
+    }
+
+    input {
+      width: 100%;
+    }
+  }
+}

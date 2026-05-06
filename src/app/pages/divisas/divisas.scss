@@ -1,0 +1,126 @@
+.divisas {
+  .titulo {
+    font-size: 1.5rem;
+    font-weight: bold;
+    color: #1e293b;
+    margin-bottom: 0.25rem;
+  }
+
+  .subtitulo {
+    color: #64748b;
+    margin-bottom: 1.5rem;
+  }
+
+  .cargando {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 1rem;
+    padding: 3rem;
+    color: #64748b;
+  }
+
+  .conversor {
+    display: grid;
+    grid-template-columns: 1fr 1.5fr;
+    gap: 1.5rem;
+    align-items: start;
+
+    @media (max-width: 768px) {
+      grid-template-columns: 1fr;
+    }
+
+    .form-conversor {
+      display: flex;
+      flex-direction: column;
+      gap: 1rem;
+
+      .fila {
+        display: flex;
+        align-items: flex-end;
+        gap: 0.75rem;
+
+        .campo {
+          display: flex;
+          flex-direction: column;
+          gap: 0.5rem;
+          flex: 1;
+
+          label {
+            font-weight: 600;
+            color: #475569;
+            font-size: 0.9rem;
+          }
+
+          input { width: 100%; }
+        }
+
+        .flecha {
+          font-size: 1.5rem;
+          padding-bottom: 0.5rem;
+          color: #64748b;
+        }
+      }
+    }
+
+    .resultado {
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+      margin-top: 1.5rem;
+      padding: 1.2rem;
+      background: #f0f9ff;
+      border-radius: 12px;
+      flex-wrap: wrap;
+
+      .cantidad-original {
+        font-size: 1.1rem;
+        color: #475569;
+      }
+
+      .igual {
+        font-size: 1.3rem;
+        color: #94a3b8;
+      }
+
+      .cantidad-convertida {
+        font-size: 1.7rem;
+        font-weight: bold;
+        color: #2563eb;
+      }
+    }
+
+    .tasa-info {
+      margin-top: 1rem;
+      color: #94a3b8;
+      font-size: 0.85rem;
+
+      .actualizacion {
+        font-size: 0.8rem;
+        margin-top: 0.25rem;
+      }
+    }
+
+    .grafica-card {
+      .grafica-titulo {
+        font-size: 1.1rem;
+        font-weight: bold;
+        color: #1e293b;
+        margin-bottom: 0.25rem;
+      }
+
+      .grafica-subtitulo {
+        color: #64748b;
+        font-size: 0.9rem;
+        font-weight: normal;
+        margin-bottom: 1rem;
+      }
+
+      .error-grafica {
+        color: #94a3b8;
+        text-align: center;
+        padding: 2rem;
+      }
+    }
+  }
+}
