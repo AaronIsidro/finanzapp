@@ -55,17 +55,12 @@
       </p-card>
 
       <p-card styleClass="grafica-card">
-        <h3 class="grafica-titulo">📈 Evolución últimos 7 días</h3>
+        <h3 class="grafica-titulo">📈 Evolución histórica</h3>
         <h4 class="grafica-subtitulo">1 {{ divisaOrigen }} → {{ divisaDestino }}</h4>
 
-        @if (cargandoGrafica) {
-          <div class="cargando">
-            <i class="pi pi-spin pi-spinner" style="font-size: 1.5rem"></i>
-            <p>Cargando histórico...</p>
-          </div>
-        } @else if (errorGrafica) {
-          <p class="error-grafica">⚠️ Histórico no disponible para esta combinación de divisas</p>
-        } @else if (chartData) {
+        @if (!chartData) {
+          <p class="error-grafica">📊 Los datos históricos se irán acumulando con cada consulta.</p>
+        } @else {
           <p-chart type="line" [data]="chartData" [options]="chartOptions" />
         }
       </p-card>

@@ -10,6 +10,11 @@ import { firstValueFrom } from 'rxjs';
 
 const API_KEY = '0532375b41ed93f6c408f409';
 
+interface PuntoHistorico {
+  fecha: string;
+  tasa: number;
+}
+
 @Component({
   selector: 'app-divisas',
   standalone: true,
@@ -27,9 +32,7 @@ export class Divisas implements OnInit {
   resultado = 0;
   tasaActual = 0;
   cargando = true;
-  cargandoGrafica = false;
   ultimaActualizacion = '';
-  errorGrafica = false;
 
   chartData: any = null;
   chartOptions: any = null;
@@ -46,9 +49,6 @@ export class Divisas implements OnInit {
     { label: '🇲🇽 Peso Mexicano (MXN)', value: 'MXN' },
     { label: '🇧🇷 Real Brasileño (BRL)', value: 'BRL' },
   ];
-
-  // Divisas soportadas por Frankfurter
-  divisasSoportadasFrankfurter = ['EUR', 'USD', 'GBP', 'JPY', 'CHF', 'CAD', 'AUD', 'CNY'];
 
   ngOnInit(): void {
     this.initChartOptions();
@@ -79,55 +79,52 @@ export class Divisas implements OnInit {
       this.tasaActual = data.conversion_rates[this.divisaDestino];
       this.resultado = this.cantidad * this.tasaActual;
       this.ultimaActualizacion = data.time_last_update_utc;
+      this.guardarEnLocalStorage();
+      this.actualizarGrafica();
     } catch (err) {
       console.error('Error al cargar tasas:', err);
     } finally {
       this.cargando = false;
       this.cdr.detectChanges();
     }
-    await this.cargarHistorico();
   }
 
-  async cargarHistorico(): Promise<void> {
-  const origenSoportado = this.divisasSoportadasFrankfurter.includes(this.divisaOrigen);
-  const destinoSoportado = this.divisasSoportadasFrankfurter.includes(this.divisaDestino);
-
-  if (!origenSoportado || !destinoSoportado) {
-    this.errorGrafica = true;
-    this.chartData = null;
-    this.cdr.detectChanges();
-    return;
+  private getStorageKey(): string {
+    return `historico_${this.divisaOrigen}_${this.divisaDestino}`;
   }
 
-  this.errorGrafica = false;
-  this.cargandoGrafica = true;
-  this.cdr.detectChanges();
-
-  try {
+  private getFechaHoy(): string {
     const hoy = new Date();
-    const hace7dias = new Date(hoy);
-    hace7dias.setDate(hoy.getDate() - 7);
+    return `${hoy.getDate().toString().padStart(2, '0')}/${(hoy.getMonth() + 1).toString().padStart(2, '0')}/${hoy.getFullYear()}`;
+  }
 
-    const fechaInicio = hace7dias.toISOString().split('T')[0];
-    const fechaFin = hoy.toISOString().split('T')[0];
+  guardarEnLocalStorage(): void {
+    const key = this.getStorageKey();
+    const historico: PuntoHistorico[] = JSON.parse(localStorage.getItem(key) || '[]');
+    const fechaHoy = this.getFechaHoy();
 
-    const data = await firstValueFrom(
-      this.http.get<any>(
-        `https://api.frankfurter.app/${fechaInicio}..${fechaFin}?from=${this.divisaOrigen}&to=${this.divisaDestino}`
-      )
-    );
+    // Solo guardar una vez por día
+    const yaExiste = historico.find(p => p.fecha === fechaHoy);
+    if (!yaExiste) {
+      historico.push({ fecha: fechaHoy, tasa: this.tasaActual });
+      localStorage.setItem(key, JSON.stringify(historico));
+    }
+  }
 
-    const labels = Object.keys(data.rates).sort();
-    const valores = labels.map(fecha => data.rates[fecha][this.divisaDestino]);
+  actualizarGrafica(): void {
+    const key = this.getStorageKey();
+    const historico: PuntoHistorico[] = JSON.parse(localStorage.getItem(key) || '[]');
+
+    if (historico.length === 0) {
+      this.chartData = null;
+      return;
+    }
 
     this.chartData = {
-      labels: labels.map(f => {
-        const d = new Date(f);
-        return `${d.getDate()}/${d.getMonth() + 1}`;
-      }),
+      labels: historico.map(p => p.fecha),
       datasets: [{
         label: `1 ${this.divisaOrigen} en ${this.divisaDestino}`,
-        data: valores,
+        data: historico.map(p => p.tasa),
         fill: true,
         borderColor: '#2563eb',
         backgroundColor: 'rgba(37, 99, 235, 0.1)',
@@ -136,44 +133,8 @@ export class Divisas implements OnInit {
         pointRadius: 5
       }]
     };
-  } catch (err) {
-    // CORS en localhost → usar datos simulados
-    this.generarGraficaSimulada();
-  } finally {
-    this.cargandoGrafica = false;
     this.cdr.detectChanges();
   }
-}
-
-generarGraficaSimulada(): void {
-  const labels: string[] = [];
-  const valores: number[] = [];
-  const hoy = new Date();
-
-  for (let i = 6; i >= 0; i--) {
-    const fecha = new Date(hoy);
-    fecha.setDate(hoy.getDate() - i);
-    labels.push(`${fecha.getDate()}/${fecha.getMonth() + 1}`);
-    const variacion = this.tasaActual * (1 + (Math.random() - 0.5) * 0.04);
-    valores.push(parseFloat(variacion.toFixed(4)));
-  }
-  valores[6] = this.tasaActual;
-
-  this.chartData = {
-    labels,
-    datasets: [{
-      label: `1 ${this.divisaOrigen} en ${this.divisaDestino} (estimado)`,
-      data: valores,
-      fill: true,
-      borderColor: '#2563eb',
-      backgroundColor: 'rgba(37, 99, 235, 0.1)',
-      tension: 0.4,
-      pointBackgroundColor: '#2563eb',
-      pointRadius: 5
-    }]
-  };
-  this.cdr.detectChanges();
-}
 
   convertir(): void {
     this.resultado = this.cantidad * this.tasaActual;
