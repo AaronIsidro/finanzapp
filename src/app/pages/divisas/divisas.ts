@@ -7,13 +7,9 @@ import { InputTextModule } from 'primeng/inputtext';
 import { DecimalPipe } from '@angular/common';
 import { ChartModule } from 'primeng/chart';
 import { firstValueFrom } from 'rxjs';
+import { HistoricoService } from '../../services/historico';
 
 const API_KEY = '0532375b41ed93f6c408f409';
-
-interface PuntoHistorico {
-  fecha: string;
-  tasa: number;
-}
 
 @Component({
   selector: 'app-divisas',
@@ -25,6 +21,7 @@ interface PuntoHistorico {
 export class Divisas implements OnInit {
   private http = inject(HttpClient);
   private cdr = inject(ChangeDetectorRef);
+  private historicoService = inject(HistoricoService);
 
   divisaOrigen = 'EUR';
   divisaDestino = 'USD';
@@ -79,60 +76,42 @@ export class Divisas implements OnInit {
       this.tasaActual = data.conversion_rates[this.divisaDestino];
       this.resultado = this.cantidad * this.tasaActual;
       this.ultimaActualizacion = data.time_last_update_utc;
-      this.guardarEnLocalStorage();
-      this.actualizarGrafica();
+      await this.historicoService.guardar(this.divisaOrigen, this.divisaDestino, this.tasaActual);
+      await this.actualizarGrafica();
     } catch (err) {
-      console.error('Error al cargar tasas:', err);
+      console.error('Error:', err);
     } finally {
       this.cargando = false;
       this.cdr.detectChanges();
     }
   }
 
-  private getStorageKey(): string {
-    return `historico_${this.divisaOrigen}_${this.divisaDestino}`;
-  }
+  async actualizarGrafica(): Promise<void> {
+    try {
+      const historico = await this.historicoService.getAll(this.divisaOrigen, this.divisaDestino);
 
-  private getFechaHoy(): string {
-    const hoy = new Date();
-    return `${hoy.getDate().toString().padStart(2, '0')}/${(hoy.getMonth() + 1).toString().padStart(2, '0')}/${hoy.getFullYear()}`;
-  }
+      if (historico.length === 0) {
+        this.chartData = null;
+        return;
+      }
 
-  guardarEnLocalStorage(): void {
-    const key = this.getStorageKey();
-    const historico: PuntoHistorico[] = JSON.parse(localStorage.getItem(key) || '[]');
-    const fechaHoy = this.getFechaHoy();
-
-    // Solo guardar una vez por día
-    const yaExiste = historico.find(p => p.fecha === fechaHoy);
-    if (!yaExiste) {
-      historico.push({ fecha: fechaHoy, tasa: this.tasaActual });
-      localStorage.setItem(key, JSON.stringify(historico));
-    }
-  }
-
-  actualizarGrafica(): void {
-    const key = this.getStorageKey();
-    const historico: PuntoHistorico[] = JSON.parse(localStorage.getItem(key) || '[]');
-
-    if (historico.length === 0) {
+      this.chartData = {
+        labels: historico.map(p => p.fecha),
+        datasets: [{
+          label: `1 ${this.divisaOrigen} en ${this.divisaDestino}`,
+          data: historico.map(p => p.tasa),
+          fill: true,
+          borderColor: '#2563eb',
+          backgroundColor: 'rgba(37, 99, 235, 0.1)',
+          tension: 0.4,
+          pointBackgroundColor: '#2563eb',
+          pointRadius: 5
+        }]
+      };
+    } catch (err) {
+      console.error('Error al cargar histórico:', err);
       this.chartData = null;
-      return;
     }
-
-    this.chartData = {
-      labels: historico.map(p => p.fecha),
-      datasets: [{
-        label: `1 ${this.divisaOrigen} en ${this.divisaDestino}`,
-        data: historico.map(p => p.tasa),
-        fill: true,
-        borderColor: '#2563eb',
-        backgroundColor: 'rgba(37, 99, 235, 0.1)',
-        tension: 0.4,
-        pointBackgroundColor: '#2563eb',
-        pointRadius: 5
-      }]
-    };
     this.cdr.detectChanges();
   }
 
